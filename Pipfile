@@ -9,6 +9,7 @@ verify_ssl = true
 requests = "*"
 lxml = "*"
 python-dotenv = "*"
+feedparser = "*"
 
 [requires]
 python_version = "3.6"
