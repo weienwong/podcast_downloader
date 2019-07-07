@@ -4,6 +4,7 @@ from lxml import html
 import sys
 import os
 from dotenv import load_dotenv
+from datetime import datetime 
 
 load_dotenv()
 
@@ -27,6 +28,27 @@ def get_jre_podcast_url():
                 podcast_list_text += title + " " + podcast_url + "\n"
         
         return podcast_list_text
+
+def get_sam_harris_making_sense_podcast():
+        rss_url = 'http://wakingup.libsyn.com/rss'
+        d = feedparser.parse(rss_url)
+        listings = d.entries
+        podcast_list = ''
+
+        for l in listings:
+                title = l['title']
+                podcast_url = l.enclosures[0]['href']
+                pub_date = l.published
+
+                # ex. Wed, 03 Jul 2019 15:43:59 +0000
+                pub_datetime = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S +0000")
+                timedelta = datetime.now() - pub_datetime
+
+                if timedelta.days <= 7:
+                        listing = title + "\n" + podcast_url + "\n" + pub_date
+                        podcast_list += listing       
+        return podcast_list
+
 
 def download_podcast(url, filename):
         with open(filename, 'wb') as fd:
@@ -52,8 +74,13 @@ def send_simple_message(to, subject, text):
 			"text": text})
 
 def main():
-    message = get_jre_podcast_url()
-    send_simple_message(["weienwong.93@gmail.com"], "This week's Joe Rogan Experience", message)
+        message = ''
+        message += "Sam Harris Making Sense Podcast\n"
+        message += get_sam_harris_making_sense_podcast()
+        message += "\n"
+        message += "Joe Rogan Experience\n"
+        message += get_jre_podcast_url()
+        send_simple_message(["weienwong.93@gmail.com"], "Podcasts", message)
 
 if __name__ == "__main__":
     main()
