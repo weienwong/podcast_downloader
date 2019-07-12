@@ -1,10 +1,11 @@
 import feedparser
 import requests
 from lxml import html
+from dotenv import load_dotenv
+
+from datetime import datetime 
 import sys
 import os
-from dotenv import load_dotenv
-from datetime import datetime 
 
 load_dotenv()
 
@@ -20,12 +21,13 @@ def get_jre_podcast_url():
 
         for l in listings:
                 title = l['title']
+                link =l['link']
                 podcast_url = l['links'][0]['href']
                 page = requests.get(podcast_url)
                 tree = html.fromstring(page.content)
                 path = '/html/body/div[2]/div/div[1]/div[1]/div/div/div[2]/div/ul/li[3]/a/@href'
                 podcast_url = tree.xpath(path)[0]
-                podcast_list_text += title + " " + podcast_url + "\n"
+                podcast_list_text += title + link + "\nDownload link: " + podcast_url + "\n\n"
         
         return podcast_list_text
 
@@ -44,11 +46,10 @@ def get_sam_harris_making_sense_podcast():
                 pub_datetime = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S +0000")
                 timedelta = datetime.now() - pub_datetime
 
-                if timedelta.days <= 7:
-                        listing = title + "\n" + podcast_url + "\n" + pub_date
+                if timedelta.days <= 30:
+                        listing = title + "\n" + podcast_url + "\n\n"
                         podcast_list += listing       
         return podcast_list
-
 
 def download_podcast(url, filename):
         with open(filename, 'wb') as fd:
@@ -78,9 +79,13 @@ def main():
         message += "Sam Harris Making Sense Podcast\n"
         message += get_sam_harris_making_sense_podcast()
         message += "\n"
+        message += "\n"
         message += "Joe Rogan Experience\n"
         message += get_jre_podcast_url()
+        message += "\n"
+        message += "\n"
         send_simple_message(["weienwong.93@gmail.com"], "Podcasts", message)
+
 
 if __name__ == "__main__":
     main()
