@@ -27,7 +27,7 @@ def get_jre_podcast_url():
                 tree = html.fromstring(page.content)
                 path = '/html/body/div[2]/div/div[1]/div[1]/div/div/div[2]/div/ul/li[3]/a/@href'
                 podcast_url = tree.xpath(path)[0]
-                podcast_list_text += title + link + "\nDownload link: " + podcast_url + "\n\n"
+                podcast_list_text += title + " " + link + "\nDownload link: " + podcast_url + "\n\n"
         
         return podcast_list_text
 
